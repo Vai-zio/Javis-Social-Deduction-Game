@@ -1,6 +1,7 @@
 using UnityEngine;
 
-public class Player : MonoBehaviour
+[System.Serializable]
+public class Player
 {
     public string playerName;
 }

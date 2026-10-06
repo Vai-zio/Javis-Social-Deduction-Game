@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using System.Collections;
 using UnityEngine.Events;
+using TMPro;
 
 public class Role : MonoBehaviour
 {
@@ -21,8 +22,6 @@ public class Role : MonoBehaviour
         Blessed, // priest removes debuffs
         Bonded,
         Doused
-
-
     }
 
     public enum Strength
@@ -32,23 +31,39 @@ public class Role : MonoBehaviour
         Powerful
     }
 
+    public static UnityEvent<List<Player>> StartVisitEvent = new UnityEvent<List<Player>>();
+    public static UnityEvent<Role> PlayerTargetSelected = new UnityEvent<Role>();
+
 
     public Player connectedPlayer;
     
 
     public Strength startDefense;
     public Strength startAttack;
-    protected List<StatusEffect> statusEffects;
+    protected List<StatusEffect> statusEffects = new List<StatusEffect>();
 
     protected Strength currentDefense;
     protected Strength currentAttack;
     protected RoleType roleType;
-    protected Player playerVisited; // Who this role visited at night
+    public List<Role> playerVisited = new List<Role>(); // Who this role visited at night
 
     public int rolePriority; // Roleblock first, then protect, then attack, then information
                              // 1, 2, 3, 4
 
-    public static UnityEvent<Role> StartVisitEvent = new UnityEvent<Role>();
+    
+    public List<Role> Attackers = new List<Role>();
+
+    public TextMeshProUGUI playerInfo;
+    public TextMeshProUGUI roleName;
+
+    private void Awake()
+    {
+        
+    }
+    public RoleType GetRoleType()
+    {
+               return roleType;
+    }
     public virtual void UpdateEffects()
     {
         if (statusEffects.Contains(StatusEffect.Protected) && currentDefense < Strength.Basic)
@@ -56,14 +71,18 @@ public class Role : MonoBehaviour
             currentDefense = Strength.Basic;
         }
     }
-    protected virtual void VisitPlayer(Player otherPlayer, Role otherRole)
+    protected virtual void VisitPlayer(Role Visited)
     {
-        Debug.Log(connectedPlayer.playerName + " visited " + otherPlayer.playerName);
+        Debug.Log(connectedPlayer.playerName + " Visited: " + Visited.connectedPlayer.playerName);
+        playerVisited.Add(Visited);
     }
 
-    protected virtual void Visited(Player playerVisiting, Role roleVisiting)
+    //Called when clicking on the button for a player, which then uses the static active player from gamemanager
+    protected virtual void Visited()
     {
-
+        Role roleVisiting = GameManager.activePlayer;
+        roleVisiting.VisitPlayer(this);
+        PlayerTargetSelected.Invoke(this);
     }
 
     protected virtual void AttackOtherPlayer(Role defender)
@@ -73,10 +92,8 @@ public class Role : MonoBehaviour
 
     public virtual void Attacked(Player attacker, Role roleAttacker)
     {
-        if (roleAttacker.currentAttack > currentDefense)
-        {
-            statusEffects.Add(StatusEffect.Dead);
-        }
+        Attackers.Add(roleAttacker);
+        
     }
 
     protected virtual void Die()
@@ -93,6 +110,19 @@ public class Role : MonoBehaviour
         playerVisited = null;
         currentDefense = startDefense;
         currentAttack = startAttack;
+    }
+    protected virtual void EndOfNight()
+    {
+        foreach(Role roleAttacker in Attackers)
+        {
+            if (roleAttacker.currentAttack > currentDefense)
+            {
+                statusEffects.Add(StatusEffect.Dead);
+            }
+        }
+
+        playerVisited.Clear();
+        
     }
 
     protected void ClearStatusEffects()
@@ -114,8 +144,8 @@ public class Role : MonoBehaviour
 
     public virtual IEnumerator ChooseTarget(List<Player> possibleTargets)
     {
-        yield return null;
-        Debug.Log("Chooses no one");
+        StartVisitEvent.Invoke(possibleTargets);
+        yield return new WaitUntil(() => playerVisited.Count > 0);
     }
 
     public virtual bool ContainsStatusEffect(StatusEffect effect)

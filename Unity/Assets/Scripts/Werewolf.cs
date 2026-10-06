@@ -3,18 +3,19 @@ using UnityEngine;
 
 public class Werewolf : Role
 {
-    private void Awake()
-    {
-        rolePriority = 3;
-    }
+    
     public override IEnumerator NightAction()
     {
-        yield return ChooseTarget(GameManager.GetValidTargets());
+        yield return ChooseTarget(GameManager.GetValidTargets(this, false));
 
-        Role role = GameManager.GetRoleFromPlayer(playerVisited);
+        if (playerVisited.Count == 0)
+        {
+            yield break;
+        }
+        Role role = playerVisited[0];
 
         AttackOtherPlayer(role);
 
-        Debug.Log("Attacked " + playerVisited.playerName);
+        Debug.Log("Attacked " + playerVisited[0].connectedPlayer.playerName);
     }
 }
