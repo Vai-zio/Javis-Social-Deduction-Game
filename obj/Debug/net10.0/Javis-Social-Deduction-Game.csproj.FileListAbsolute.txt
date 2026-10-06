@@ -1,0 +1,15 @@
+C:\Users\Vai\RiderProjects\Javis-Social-Deduction-Game\bin\Debug\net10.0\Javis-Social-Deduction-Game.exe
+C:\Users\Vai\RiderProjects\Javis-Social-Deduction-Game\bin\Debug\net10.0\Javis-Social-Deduction-Game.deps.json
+C:\Users\Vai\RiderProjects\Javis-Social-Deduction-Game\bin\Debug\net10.0\Javis-Social-Deduction-Game.runtimeconfig.json
+C:\Users\Vai\RiderProjects\Javis-Social-Deduction-Game\bin\Debug\net10.0\Javis-Social-Deduction-Game.dll
+C:\Users\Vai\RiderProjects\Javis-Social-Deduction-Game\bin\Debug\net10.0\Javis-Social-Deduction-Game.pdb
+C:\Users\Vai\RiderProjects\Javis-Social-Deduction-Game\obj\Debug\net10.0\Javis-Social-Deduction-Game.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\Vai\RiderProjects\Javis-Social-Deduction-Game\obj\Debug\net10.0\Javis-Social-Deduction-Game.AssemblyInfoInputs.cache
+C:\Users\Vai\RiderProjects\Javis-Social-Deduction-Game\obj\Debug\net10.0\Javis-Social-Deduction-Game.AssemblyInfo.cs
+C:\Users\Vai\RiderProjects\Javis-Social-Deduction-Game\obj\Debug\net10.0\Javis-Social-Deduction-Game.csproj.CoreCompileInputs.cache
+C:\Users\Vai\RiderProjects\Javis-Social-Deduction-Game\obj\Debug\net10.0\Javis-Social-Deduction-Game.sourcelink.json
+C:\Users\Vai\RiderProjects\Javis-Social-Deduction-Game\obj\Debug\net10.0\Javis-Social-Deduction-Game.dll
+C:\Users\Vai\RiderProjects\Javis-Social-Deduction-Game\obj\Debug\net10.0\refint\Javis-Social-Deduction-Game.dll
+C:\Users\Vai\RiderProjects\Javis-Social-Deduction-Game\obj\Debug\net10.0\Javis-Social-Deduction-Game.pdb
+C:\Users\Vai\RiderProjects\Javis-Social-Deduction-Game\obj\Debug\net10.0\Javis-Social-Deduction-Game.genruntimeconfig.cache
+C:\Users\Vai\RiderProjects\Javis-Social-Deduction-Game\obj\Debug\net10.0\ref\Javis-Social-Deduction-Game.dll

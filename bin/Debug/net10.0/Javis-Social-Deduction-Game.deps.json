@@ -1,0 +1,23 @@
+{
+  "runtimeTarget": {
+    "name": ".NETCoreApp,Version=v10.0",
+    "signature": ""
+  },
+  "compilationOptions": {},
+  "targets": {
+    ".NETCoreApp,Version=v10.0": {
+      "Javis-Social-Deduction-Game/1.0.0": {
+        "runtime": {
+          "Javis-Social-Deduction-Game.dll": {}
+        }
+      }
+    }
+  },
+  "libraries": {
+    "Javis-Social-Deduction-Game/1.0.0": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
+    }
+  }
+}

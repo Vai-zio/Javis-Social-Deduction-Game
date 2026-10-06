@@ -13,16 +13,7 @@ enum Category
     NeutralBenign, NeutralEvil, NeutralKilling, NeutralChaos
 }
 
-// A "slot" is a line in the role list, like "Town Investigative".
-// The program turns each slot into a concrete role.
-enum Slot
-{
-    Jailor, EvilLeader, EvilKiller, EvilRandom,
-    TownInvestigative, TownProtective, TownKilling, TownSupport, TownRandom,
-    NeutralEvil, NeutralKilling, Any
-}
-
-enum GameMode { Classic = 1, Coven = 2, AllAny = 3 }
+enum GameMode { Classic = 1, Coven = 2 }
 
 enum Role
 {
@@ -91,13 +82,10 @@ class Program
         Role.Hypnotist, Role.GuardianAngel, Role.Juggernaut, Role.Pirate, Role.Plaguebearer
     };
 
-    // The 15-player Ranked role list, ordered so the first N slots still make a fair game.
-    static readonly Slot[] SlotOrder =
-    {
-        Slot.EvilLeader, Slot.Jailor, Slot.TownInvestigative, Slot.TownProtective, Slot.EvilKiller,
-        Slot.NeutralEvil, Slot.TownSupport, Slot.TownKilling, Slot.TownInvestigative, Slot.EvilRandom,
-        Slot.NeutralKilling, Slot.TownRandom, Slot.TownRandom, Slot.TownRandom, Slot.Any
-    };
+    // Team sizes as fractions of the player count. Change these to rebalance.
+    const double EvilShare    = 0.33;
+    const double NeutralShare = 0.10;
+    const double InfoShare    = 0.20;   // Town information roles (Sheriff, Spy, Investigator...)
 
     // ---------- RULES ----------
     static Faction FactionOf(Role r) => categoryOf[r] switch
@@ -132,22 +120,9 @@ class Program
         return options[rng.Next(options.Count)];
     }
 
-    // Turn a slot into a real role.
-    static Role Fill(Slot s) => s switch
-    {
-        Slot.Jailor            => Pick(r => r == Role.Jailor),
-        Slot.EvilLeader        => Pick(r => r == (mode == GameMode.Coven ? Role.CovenLeader : Role.Godfather)),
-        Slot.EvilKiller        => Pick(r => r == (mode == GameMode.Coven ? Role.Medusa : Role.Mafioso)),
-        Slot.EvilRandom        => Pick(r => FactionOf(r) == EvilFaction),
-        Slot.TownInvestigative => Pick(r => categoryOf[r] == Category.TownInvestigative),
-        Slot.TownProtective    => Pick(r => categoryOf[r] == Category.TownProtective),
-        Slot.TownKilling       => Pick(r => categoryOf[r] == Category.TownKilling),
-        Slot.TownSupport       => Pick(r => categoryOf[r] == Category.TownSupport),
-        Slot.TownRandom        => Pick(r => FactionOf(r) == Faction.Town),
-        Slot.NeutralEvil       => Pick(r => categoryOf[r] == Category.NeutralEvil),
-        Slot.NeutralKilling    => Pick(r => categoryOf[r] == Category.NeutralKilling),
-        _                      => Pick(r => true)   // Any
-    };
+    // Round to the nearest whole player (0.5 rounds up, not to the nearest even number).
+    static int Share(int players, double share) =>
+        (int)Math.Round(players * share, MidpointRounding.AwayFromZero);
 
     // ---------- PROGRAM ----------
     static void Main()
@@ -155,11 +130,10 @@ class Program
         Console.WriteLine("Choose game mode:");
         Console.WriteLine("1 - Classic  (original roles, Mafia)");
         Console.WriteLine("2 - Coven    (all roles, Coven replaces Mafia)");
-        Console.WriteLine("3 - All Any  (every slot is random)");
         Console.Write("> ");
         if (!int.TryParse(Console.ReadLine(), out int m) || !Enum.IsDefined(typeof(GameMode), m))
         {
-            Console.WriteLine("Pick 1, 2 or 3.");
+            Console.WriteLine("Pick 1 or 2.");
             return;
         }
         mode = (GameMode)m;   // casting a number to an enum
@@ -171,15 +145,32 @@ class Program
             return;
         }
 
-        var slots = mode == GameMode.AllAny
-            ? Enumerable.Repeat(Slot.Any, players).ToList()
-            : SlotOrder.Take(players).ToList();
+        // 1) Work out team sizes from the percentages
+        int evilCount    = Math.Max(1, Share(players, EvilShare));   // always at least 1 evil
+        int neutralCount = Share(players, NeutralShare);
+        int townCount    = players - evilCount - neutralCount;       // town gets the rest
+        int infoCount    = Math.Clamp(Share(players, InfoShare), 1, townCount); // at least 1, never more than Town
 
-        foreach (Slot s in slots)
-            used.Add(Fill(s));
+        // 2) Guaranteed killing roles: Mafioso always, Godfather too if 3+ Mafia
+        //    (in Coven mode: Medusa always, Coven Leader too if 3+ Coven)
+        Role killer = mode == GameMode.Coven ? Role.Medusa      : Role.Mafioso;
+        Role leader = mode == GameMode.Coven ? Role.CovenLeader : Role.Godfather;
+        used.Add(killer);
+        if (evilCount >= 3) used.Add(leader);
 
-        Console.WriteLine($"\n=== Role List ({mode}) ===");
-        foreach (Slot s in slots) Console.WriteLine($"- {s}");
+        // 3) Fill the remaining spots with fully random roles from each faction.
+        //    The leader is never picked at random: it was either added above,
+        //    or the team is too small to have one.
+        while (used.Count < evilCount)         used.Add(Pick(r => FactionOf(r) == EvilFaction && r != leader));
+        for (int i = 0; i < neutralCount; i++) used.Add(Pick(r => FactionOf(r) == Faction.Neutral));
+
+        // 4) Town: first the information roles, then the rest from the other Town categories
+        for (int i = 0; i < infoCount; i++)
+            used.Add(Pick(r => categoryOf[r] == Category.TownInvestigative));
+        for (int i = 0; i < townCount - infoCount; i++)
+            used.Add(Pick(r => FactionOf(r) == Faction.Town && categoryOf[r] != Category.TownInvestigative));
+
+        Console.WriteLine($"\n=== {mode}: {evilCount} {EvilFaction}, {neutralCount} Neutral, {townCount} Town ({infoCount} info) ===");
 
         List<Role> roles = new List<Role>(used);
         Shuffle(roles);
