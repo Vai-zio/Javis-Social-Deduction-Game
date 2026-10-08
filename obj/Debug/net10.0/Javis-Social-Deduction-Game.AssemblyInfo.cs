@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("Javis-Social-Deduction-Game")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+25aa30fc70e0a3d3896258428a637dd9bfadf0e7")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+bc68e3874b0b5ebf4cc5236e5b7673aea779f78c")]
 [assembly: System.Reflection.AssemblyProductAttribute("Javis-Social-Deduction-Game")]
 [assembly: System.Reflection.AssemblyTitleAttribute("Javis-Social-Deduction-Game")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
