@@ -2,6 +2,7 @@ using NUnit.Framework;
 using TMPro;
 using UnityEngine;
 using System.Collections.Generic;
+using System;
 
 public class UIManager : MonoBehaviour
 {
@@ -23,8 +24,9 @@ public class UIManager : MonoBehaviour
         foreach (Player target in playerTargets)
         {
             Role role = GameManager.GetRoleFromPlayer(target);
+            role.gameObject.SetActive(true);
 
-            GameManager.roleGameObjectDictionary[role].gameObject.SetActive(true);
+            GameManager.instance.StartSelectTarget();
         }
     }
 
@@ -55,7 +57,7 @@ public class UIManager : MonoBehaviour
                 titleText.text = "Select voted target";
                 continueButtonText.text = "Abstain";
                 break;
-            case GameManager.GameState.Night:
+            case GameManager.GameState.NightStart:
                 titleText.text = "The town sleeps...";
                 continueButtonText.text = "Continue to night";
                 break;
@@ -68,8 +70,9 @@ public class UIManager : MonoBehaviour
 
     public void SkipButton()
     {
-
+        
     }
+
 
     
 }

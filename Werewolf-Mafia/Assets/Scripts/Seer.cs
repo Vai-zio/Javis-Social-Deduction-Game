@@ -8,6 +8,10 @@ public class Seer : Role
     public override IEnumerator NightAction()
     {
         yield return ChooseTarget(GameManager.GetValidTargets(this, false));
+        if (playerVisited.Count == 0)
+        {
+            yield break;
+        }
         yield return ChooseTarget(GameManager.GetValidTargets(this, false));
 
         if (playerVisited.Count == 0)

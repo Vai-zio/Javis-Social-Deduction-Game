@@ -30,7 +30,9 @@ public class Role : MonoBehaviour
         Basic,
         Powerful
     }
-
+    public TextMeshProUGUI playerInfoText;
+    public TextMeshProUGUI roleNameText;
+    public string roleName;
     public static UnityEvent<List<Player>> StartVisitEvent = new UnityEvent<List<Player>>();
     public static UnityEvent<Role> PlayerTargetSelected = new UnityEvent<Role>();
 
@@ -46,6 +48,7 @@ public class Role : MonoBehaviour
     protected Strength currentAttack;
     protected RoleType roleType;
     public List<Role> playerVisited = new List<Role>(); // Who this role visited at night
+    public bool visitOver;
 
     public int rolePriority; // Roleblock first, then protect, then attack, then information
                              // 1, 2, 3, 4
@@ -53,19 +56,37 @@ public class Role : MonoBehaviour
     
     public List<Role> Attackers = new List<Role>();
 
-    public TextMeshProUGUI playerInfo;
-    public TextMeshProUGUI roleName;
 
     private void Awake()
     {
         
     }
+    private void Update()
+    {
+        UpdateEffects();
+    }
     public RoleType GetRoleType()
     {
                return roleType;
     }
+
+    public void OnClicked()
+    {
+        GameManager.instance.OnSelectedTarget(this);
+    }
     public virtual void UpdateEffects()
     {
+        if (connectedPlayer == null)
+        {
+            Debug.Log("Player is null");
+            return;
+        }
+        string playerInfo = "";
+        foreach(StatusEffect effect in statusEffects)
+        {
+            playerInfo += effect.ToString() + ", ";
+        }
+        connectedPlayer.UpdateInfoText(playerInfoText, playerInfo);
         if (statusEffects.Contains(StatusEffect.Protected) && currentDefense < Strength.Basic)
         {
             currentDefense = Strength.Basic;
@@ -73,16 +94,14 @@ public class Role : MonoBehaviour
     }
     protected virtual void VisitPlayer(Role Visited)
     {
-        Debug.Log(connectedPlayer.playerName + " Visited: " + Visited.connectedPlayer.playerName);
         playerVisited.Add(Visited);
     }
 
-    //Called when clicking on the button for a player, which then uses the static active player from gamemanager
-    protected virtual void Visited()
+    
+    public virtual void Visited(Role visitor)
     {
-        Role roleVisiting = GameManager.activePlayer;
-        roleVisiting.VisitPlayer(this);
-        PlayerTargetSelected.Invoke(this);
+        
+        visitor.VisitPlayer(this);
     }
 
     protected virtual void AttackOtherPlayer(Role defender)
@@ -96,9 +115,10 @@ public class Role : MonoBehaviour
         
     }
 
-    protected virtual void Die()
+    public virtual void Die()
     {
         statusEffects.Add(StatusEffect.Dead);
+        Debug.Log(connectedPlayer.playerName + " Has died.");
     }
 
     protected virtual void VotedOut()
@@ -117,7 +137,7 @@ public class Role : MonoBehaviour
         {
             if (roleAttacker.currentAttack > currentDefense)
             {
-                statusEffects.Add(StatusEffect.Dead);
+                Die();
             }
         }
 
@@ -138,14 +158,16 @@ public class Role : MonoBehaviour
 
     public virtual IEnumerator NightAction()
     {
-        yield return null;
-        Debug.Log("Visits no one");
+        yield return new WaitForEndOfFrame();
+
     }
 
     public virtual IEnumerator ChooseTarget(List<Player> possibleTargets)
     {
+        GameManager.OnTargetSelectionStart(this);
         StartVisitEvent.Invoke(possibleTargets);
-        yield return new WaitUntil(() => playerVisited.Count > 0);
+        yield return new WaitUntil(() => visitOver);
+        visitOver = false;
     }
 
     public virtual bool ContainsStatusEffect(StatusEffect effect)
