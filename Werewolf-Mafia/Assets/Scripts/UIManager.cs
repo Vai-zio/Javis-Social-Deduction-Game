@@ -6,14 +6,18 @@ using System;
 
 public class UIManager : MonoBehaviour
 {
-    
+    public static UIManager instance;
     public TextMeshProUGUI titleText;
     public TextMeshProUGUI continueButtonText;
+
+    public Color buttonDefaultColor;
+    public Color buttonDisabledColor;
 
     
 
     private void Awake()
     {
+        instance = this;
         Role.StartVisitEvent.AddListener(ShowTargetUI);
         Role.PlayerTargetSelected.AddListener(ResetRoleUI);
     }
@@ -24,7 +28,7 @@ public class UIManager : MonoBehaviour
         foreach (Player target in playerTargets)
         {
             Role role = GameManager.GetRoleFromPlayer(target);
-            role.gameObject.SetActive(true);
+            role.roleDisabled = false;
 
             GameManager.instance.StartSelectTarget();
         }
@@ -34,14 +38,14 @@ public class UIManager : MonoBehaviour
     {
         foreach(var role in GameManager.roleGameObjectDictionary)
         {
-            role.Value.SetActive(false);
+            role.Key.roleDisabled = true;
         }
     }
     private void ResetRoleUI(Role target)
     {
         foreach (var role in GameManager.roleGameObjectDictionary)
         {
-            role.Value.SetActive(true);
+            role.Key.roleDisabled = false;
         }
     }
     private void Update()
@@ -51,7 +55,7 @@ public class UIManager : MonoBehaviour
         {
             case GameManager.GameState.Discussion:
                 titleText.text = "Discussion time";
-                continueButtonText.text = "Start voting";
+                continueButtonText.text = "Continue to voting";
                 break;
             case GameManager.GameState.Voting:
                 titleText.text = "Select voted target";
@@ -61,9 +65,13 @@ public class UIManager : MonoBehaviour
                 titleText.text = "The town sleeps...";
                 continueButtonText.text = "Continue to night";
                 break;
+            case GameManager.GameState.Night:
+                titleText.text = "It's a full moon out..";
+                continueButtonText.text = "Continue";
+                break;
             case GameManager.GameState.SelectTarget:
                 titleText.text = "Select a target";
-                continueButtonText.text = "Abstain";
+                continueButtonText.text = "No Target";
                 break;
         }
     }

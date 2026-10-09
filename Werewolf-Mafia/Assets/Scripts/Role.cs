@@ -3,6 +3,7 @@ using UnityEngine;
 using System.Collections;
 using UnityEngine.Events;
 using TMPro;
+using UnityEngine.UI;
 
 public class Role : MonoBehaviour
 {
@@ -49,6 +50,7 @@ public class Role : MonoBehaviour
     protected RoleType roleType;
     public List<Role> playerVisited = new List<Role>(); // Who this role visited at night
     public bool visitOver;
+    public bool roleDisabled;
 
     public int rolePriority; // Roleblock first, then protect, then attack, then information
                              // 1, 2, 3, 4
@@ -57,13 +59,30 @@ public class Role : MonoBehaviour
     public List<Role> Attackers = new List<Role>();
 
 
+
+    Button privateButton;
     private void Awake()
     {
-        
+        privateButton = GetComponentInChildren<Button>();
     }
     private void Update()
     {
+        if (roleDisabled)
+        {
+            ShowDisabled(UIManager.instance.buttonDisabledColor);
+            privateButton.interactable = false;
+        }
+        else
+        {
+            privateButton.interactable = true;
+        }
         UpdateEffects();
+    }
+    private void ShowDisabled(Color newColor)
+    {
+        ColorBlock colors = privateButton.colors;
+        colors.disabledColor = newColor;
+        privateButton.colors = colors;
     }
     public RoleType GetRoleType()
     {
@@ -82,6 +101,10 @@ public class Role : MonoBehaviour
             return;
         }
         string playerInfo = "";
+        if (Attackers.Count > 0)
+        {
+            playerInfo += "Attacked, ";
+        }
         foreach(StatusEffect effect in statusEffects)
         {
             playerInfo += effect.ToString() + ", ";
@@ -95,6 +118,7 @@ public class Role : MonoBehaviour
     protected virtual void VisitPlayer(Role Visited)
     {
         playerVisited.Add(Visited);
+        visitOver = true;
     }
 
     
@@ -102,6 +126,7 @@ public class Role : MonoBehaviour
     {
         
         visitor.VisitPlayer(this);
+        
     }
 
     protected virtual void AttackOtherPlayer(Role defender)
@@ -123,7 +148,7 @@ public class Role : MonoBehaviour
 
     protected virtual void VotedOut()
     {
-        statusEffects.Add(StatusEffect.Dead);
+        Die();
     }
     protected virtual void ResetDay()
     {
@@ -131,7 +156,7 @@ public class Role : MonoBehaviour
         currentDefense = startDefense;
         currentAttack = startAttack;
     }
-    protected virtual void EndOfNight()
+    public virtual void EndOfNight()
     {
         foreach(Role roleAttacker in Attackers)
         {
@@ -140,7 +165,7 @@ public class Role : MonoBehaviour
                 Die();
             }
         }
-
+        Attackers.Clear();
         playerVisited.Clear();
         
     }
@@ -166,7 +191,7 @@ public class Role : MonoBehaviour
     {
         GameManager.OnTargetSelectionStart(this);
         StartVisitEvent.Invoke(possibleTargets);
-        yield return new WaitUntil(() => visitOver);
+        yield return new WaitUntil(() => visitOver == true);
         visitOver = false;
     }
 

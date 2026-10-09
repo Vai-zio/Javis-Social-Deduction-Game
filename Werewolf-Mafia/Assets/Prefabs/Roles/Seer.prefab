@@ -134,6 +134,8 @@ MonoBehaviour:
   startDefense: 0
   startAttack: 0
   playerVisited: []
+  visitOver: 0
+  roleDisabled: 0
   rolePriority: 4
   Attackers: []
 --- !u!1 &2829494100351596540

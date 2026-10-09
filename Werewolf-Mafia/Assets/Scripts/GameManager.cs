@@ -84,8 +84,7 @@ public class GameManager : MonoBehaviour
             {
                 activePlayer.visitOver = true;
             }
-            
-            IncreaseGameState();
+            state = GameState.Night;
             return;
         }
         if (target.ContainsStatusEffect(Role.StatusEffect.Dead))
@@ -116,11 +115,9 @@ public class GameManager : MonoBehaviour
     private void IncreaseGameState()
     {
         int maxEnum = Enum.GetNames(typeof(GameState)).Length;
-        Debug.Log("Max enum size is: " + maxEnum);
-
-        Debug.Log("Old state: " + (int)state);
+        
         int nextState = ((int)state + 1) % maxEnum;
-        Debug.Log("State changed to: " + nextState);
+        Debug.Log("State changed to: " + (GameState)nextState);
         state = (GameState)nextState;
     }
     public void Skip()
@@ -131,7 +128,7 @@ public class GameManager : MonoBehaviour
         if (state == GameState.SelectTarget)
         {
             Role.PlayerTargetSelected.Invoke(null);
-            state = GameState.Night;
+            
         }
         else
         {
@@ -142,9 +139,10 @@ public class GameManager : MonoBehaviour
 
         switch(state)
         {
+            //Should never be able to skip to discussion
             case GameState.Discussion:
                 //Start of day, calculates what happened during the night
-                CalculateNight();
+                
                 break;
             case GameState.Voting:
                 //Start of voting
@@ -246,16 +244,19 @@ public class GameManager : MonoBehaviour
             //This is where all roles do their specific tasks at night if any.
             yield return activePlayer.NightAction();
         }
+        CalculateNight();
         yield return null;
     }
 
     public void CalculateNight()
     {
+        state = GameState.Discussion;
         dayMessage = "";
         List<Player> playersToRemove = new List<Player>();
 
         foreach (var role in rolesAlive)
         {
+            role.Value.EndOfNight();
             if (role.Value.ContainsStatusEffect(Role.StatusEffect.Dead))
             {
                 playersToRemove.Add(role.Key);
@@ -296,7 +297,6 @@ public class GameManager : MonoBehaviour
                 continue;
             }
             validTargets.Add(players.Key);
-            Debug.Log("Valid target: " + players.Key.playerName);
         }
         return validTargets;
     }

@@ -1302,11 +1302,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f1201d600f7e2044481a25bb7772fb21, type: 3}
   m_Name: 
   m_EditorClassIdentifier: '::'
+  gameState: 0
   prefabs:
   - rolePrefab: {fileID: 2813337575292154851, guid: f60b736c3e3fb31408d6629689ba1e57, type: 3}
     role: {fileID: 7353075545345217532, guid: f60b736c3e3fb31408d6629689ba1e57, type: 3}
   - rolePrefab: {fileID: 4190393997629118215, guid: b1bea9a294f8cda4b9bac9a327100992, type: 3}
     role: {fileID: 9023699433444432540, guid: b1bea9a294f8cda4b9bac9a327100992, type: 3}
+  _activePlayer: {fileID: 0}
   roleGridParent: {fileID: 1838543070}
   testPlayers:
   - playerName: GH
@@ -1349,6 +1351,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::UIManager
   titleText: {fileID: 584096034}
   continueButtonText: {fileID: 1415741035}
+  buttonDefaultColor: {r: 0.78431374, g: 0.78431374, b: 0.78431374, a: 0.5019608}
+  buttonDisabledColor: {r: 1, g: 0, b: 0, a: 1}
 --- !u!1 &2040743244
 GameObject:
   m_ObjectHideFlags: 0
