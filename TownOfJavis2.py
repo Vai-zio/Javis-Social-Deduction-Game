@@ -62,7 +62,7 @@ ROLE_SLOTS = {
     ],
     13: [
         "town_info", "town_info", "town_info",
-        "town_util", "town_util", "town_kill",
+        "town_util", "town_util", "town_util", "town_kill",
         "mafia_kill", "mafia_kill", "mafia_util", "mafia_util",
         "neutral", "neutral",
     ],
@@ -321,7 +321,7 @@ OTHER_NIGHTS = {
     ],
     "Killing": [
         "Mafioso",
-        "Godfather"
+        "Godfather",
         "Serial Killer",
         "Arsonist",
         "Hunter",
