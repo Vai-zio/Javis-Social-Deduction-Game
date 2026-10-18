@@ -4,3 +4,4 @@ obj
 bin
 .idea
 .git
+.gitignore
