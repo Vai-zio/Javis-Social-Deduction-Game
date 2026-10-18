@@ -1,2 +1,6 @@
 .env
 __pycache__/
+obj
+bin
+.idea
+.git
