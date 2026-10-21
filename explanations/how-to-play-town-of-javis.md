@@ -44,4 +44,4 @@ The narrator is the referee for the details, like what exactly a role learns.
 
 `ROLE_SLOTS` in `TownOfJavis2.py` lists a setup for each player count from 6 to 15. For example, 6 players get 2 Town info, 1 Town support, 1 Mafia killing, 1 Mafia support and 1 Neutral. Change that list to rebalance the game. `/stats` shows how often each side wins so you can tell if it needs it.
 
-Try `/gametest` to roll a fake game and see a setup without real players.
+Try `/gametest` to roll a fake game and see a setup without real players. Add a number, like `/gametest players:9`, to see the roles for that many players.

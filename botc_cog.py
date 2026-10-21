@@ -466,8 +466,11 @@ class BotcCog(commands.GroupCog, name="botc",
         await open_lobby(interaction)
 
     @app_commands.command(name="test", description="Roll a test game with 5-15 fake players.")
-    async def test(self, interaction: discord.Interaction):
-        count = random.randint(MIN_PLAYERS, MAX_PLAYERS)
+    @app_commands.describe(players="How many players (leave empty for a random number)")
+    async def test(self, interaction: discord.Interaction,
+                   players: app_commands.Range[int, MIN_PLAYERS, MAX_PLAYERS] | None = None):
+        # Same idea as /gametest: Discord only accepts 5 to 15 here.
+        count = players or random.randint(MIN_PLAYERS, MAX_PLAYERS)
         game = BotcGame(interaction.channel_id, interaction.user.id, interaction.user.display_name)
         game.players = list(range(1, count + 1))
         game.names = {i: f"Test{i}" for i in game.players}

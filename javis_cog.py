@@ -583,9 +583,13 @@ class JavisCog(commands.Cog):
         self.bot.add_view(TrialView())
 
     @app_commands.command(name="gametest", description="Roll a test game with 6-15 fake players.")
-    async def gametest(self, interaction: discord.Interaction):
+    @app_commands.describe(players="How many players (leave empty for a random number)")
+    async def gametest(self, interaction: discord.Interaction,
+                       players: app_commands.Range[int, MIN_PLAYERS, MAX_PLAYERS] | None = None):
+        # Range[int, low, high] tells Discord the allowed numbers, so Discord
+        # itself refuses anything outside them before the bot sees it.
         # Fake players are just ids 1..count with made-up names. It isn't saved.
-        count = random.randint(MIN_PLAYERS, MAX_PLAYERS)
+        count = players or random.randint(MIN_PLAYERS, MAX_PLAYERS)
         game = Game(interaction.channel_id, interaction.user.id, interaction.user.display_name)
         game.players = list(range(1, count + 1))
         game.names = {i: f"Test{i}" for i in game.players}
