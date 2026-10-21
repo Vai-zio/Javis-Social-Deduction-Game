@@ -416,9 +416,13 @@ def player_at(game: BotcGame, seat: int) -> int | None:
     return game.players[seat - 1] if 1 <= seat <= len(game.players) else None
 
 
-class BotcCog(commands.GroupCog, name="botc"):
+class BotcCog(commands.GroupCog, name="botc",
+              group_description="Blood on the Clocktower commands"):
     """A GroupCog puts every command under one name, so /botc new, /botc day, ...
-    That keeps them apart from the Town of Javis commands."""
+    That keeps them apart from the Town of Javis commands.
+
+    Without group_description, discord.py sends this docstring to Discord as
+    the group's description, and Discord rejects anything over 100 characters."""
 
     def __init__(self, bot: commands.Bot):
         self.bot = bot
