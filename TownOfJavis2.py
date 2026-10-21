@@ -94,6 +94,7 @@ FIRST_NIGHT_ORDER = [
     "Poisoner",
     "Framer",
     "Blackmailer",
+    "Witch",
     "Arsonist",
     "Doctor",
     "Mayor",
@@ -115,7 +116,7 @@ FIRST_NIGHT_ORDER = [
 ]
 
 # These are currently unused, but can be used later for subsequent nights.
-OTHER_NIGHTS_1 = ["Jailor", "Poisoner", "Framer", "Blackmailer"]
+OTHER_NIGHTS_1 = ["Jailor", "Poisoner", "Framer", "Blackmailer", "Witch"]
 OTHER_NIGHTS_2 = [
     "Godfather / Mafioso",
     "Serial Killer",
@@ -318,6 +319,7 @@ OTHER_NIGHTS = {
         "Poisoner",
         "Framer",
         "Blackmailer",
+        "Witch",
     ],
     "Killing": [
         "Mafioso",
@@ -362,6 +364,45 @@ def display_other_nights(roles: list[str]) -> None:
 
         for role in active_roles:
             print(role)
+
+
+# ---------------------------------------------------------------------------
+# Teams and win conditions
+# ---------------------------------------------------------------------------
+
+TOWN_ROLES = TOWN_INFO + TOWN_KILL + TOWN_UTIL
+MAFIA_ROLES = MAFIA_KILL + MAFIA_UTIL
+
+
+def team_of(role: str) -> str:
+    """Town, Mafia, or Neutral (anything else)."""
+    if role in TOWN_ROLES:
+        return "Town"
+    if role in MAFIA_ROLES:
+        return "Mafia"
+    return "Neutral"
+
+
+def check_winner(alive_roles: list[str]) -> str | None:
+    """
+    Look at who is still alive and return the winning side, or None.
+
+    The idea: a side wins once nobody left can stop it.
+    - Town wins when every killer (Mafia and killing neutrals) is dead.
+    - Mafia wins when no killing neutral is left and the Mafia are at least
+      half the living players, because then they can win every vote.
+    - A killing neutral wins when it is alone with at most one other player.
+    """
+    mafia = sum(1 for r in alive_roles if team_of(r) == "Mafia")
+    neutral_killers = [r for r in alive_roles if r in NEUTRAL_KILL]
+
+    if mafia == 0 and not neutral_killers:
+        return "Town"
+    if not neutral_killers and mafia >= len(alive_roles) - mafia:
+        return "Mafia"
+    if mafia == 0 and len(neutral_killers) == 1 and len(alive_roles) <= 2:
+        return neutral_killers[0]
+    return None
 
 
 # ---------------------------------------------------------------------------
