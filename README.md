@@ -21,7 +21,7 @@ Tip: put your server ID in `GUILD_ID` (right-click the server with Developer Mod
 ## Commands
 
 Narrator:
-- `/newgame` opens a lobby (6 to 15 players); you become the narrator.
+- `/newgame javis` (or pick `1`) opens a lobby (6 to 15 players); you become the narrator.
 - `/night` starts a night. Every living night role gets a dropdown by DM, and you get one summary when all have chosen.
 - `/nightsummary` shows tonight's choices so far.
 - `/kill seat` kills a player and reveals their role.
@@ -49,7 +49,7 @@ Everyone:
 All under `/botc`. The bot is the table and the cards; the Storyteller still runs the night.
 
 Storyteller:
-- `/botc new` opens a lobby (5 to 15 players). **Start** DMs each player their character (the Drunk is told a fake Townsfolk, the Imp gets 3 bluffs) and DMs you the grimoire with the table picture.
+- `/newgame botc` (or pick `2`, or `/botc new`) opens a lobby (5 to 15 players). **Start** DMs each player their character (the Drunk is told a fake Townsfolk, the Imp gets 3 bluffs) and DMs you the grimoire with the table picture.
 - `/botc night` announces night and shows you tonight's wake order.
 - `/botc ask seat question picks` DMs a player a dropdown (for the Fortune Teller, Monk, Imp, ...). Their answer comes back to you by DM.
 - `/botc tell seat message` DMs a player what they learn.
