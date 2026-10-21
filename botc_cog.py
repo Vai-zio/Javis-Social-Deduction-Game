@@ -420,11 +420,25 @@ async def open_lobby(interaction: discord.Interaction):
     """Open a Clocktower lobby. Used by /botc new and by /newgame botc in bot.py."""
     if interaction.channel_id in games:
         return await interaction.response.send_message(
-            "There's already a game here. The Storyteller can /botc endgame it.", ephemeral=True)
+            "There's already a game here. The Storyteller can /endgame it.", ephemeral=True)
     game = BotcGame(interaction.channel_id, interaction.user.id, interaction.user.display_name)
     games[interaction.channel_id] = game
     save_games()
     await interaction.response.send_message(lobby_text(game), view=LobbyView())
+
+
+async def stop_game(interaction: discord.Interaction, winner: str = "none"):
+    """End the Clocktower game in this channel. Used by /botc endgame and /endgame."""
+    game = games[interaction.channel_id]
+    if interaction.user.id != game.host_id:
+        return await interaction.response.send_message("Only the Storyteller can end it.", ephemeral=True)
+    del games[game.channel_id]
+    save_games()
+    if not game.started:
+        return await interaction.response.send_message("Lobby closed.")
+    title = f"**{winner} wins!**" if winner != "none" else "**Game over.**"
+    await interaction.response.send_message(
+        f"{title}\n\n{grimoire_text(game)}", file=table_file(game, show_roles=True))
 
 
 class BotcCog(commands.GroupCog, name="botc",
@@ -616,18 +630,9 @@ class BotcCog(commands.GroupCog, name="botc",
         app_commands.Choice(name="Nobody (stop the game)", value="none"),
     ])
     async def endgame(self, interaction: discord.Interaction, winner: str = "none"):
-        game = games.get(interaction.channel_id)
-        if not game:
+        if interaction.channel_id not in games:
             return await interaction.response.send_message("No game here.", ephemeral=True)
-        if interaction.user.id != game.host_id:
-            return await interaction.response.send_message("Only the Storyteller can end it.", ephemeral=True)
-        del games[game.channel_id]
-        save_games()
-        if not game.started:
-            return await interaction.response.send_message("Lobby closed.")
-        title = f"**{winner} wins!**" if winner != "none" else "**Game over.**"
-        await interaction.response.send_message(
-            f"{title}\n\n{grimoire_text(game)}", file=table_file(game, show_roles=True))
+        await stop_game(interaction, winner)
 
 
 async def setup(bot: commands.Bot):

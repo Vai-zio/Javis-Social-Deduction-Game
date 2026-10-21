@@ -11,7 +11,7 @@ How it fits together:
      loads them:
        javis_cog.py  Town of Javis: /night, /vote, ...
        botc_cog.py   Blood on the Clocktower: /botc nominate, ...
-     /newgame lives here because it starts either game.
+     /newgame and /endgame live here because they work for either game.
 """
 
 import os
@@ -75,11 +75,33 @@ bot = JavisBot()
     app_commands.Choice(name="2 - Blood on the Clocktower (botc)", value="botc"),
 ])
 async def newgame(interaction: discord.Interaction, game: str):
+    # One game per channel, whichever game it is.
+    if interaction.channel_id in botc_cog.games or interaction.channel_id in javis_cog.games:
+        return await interaction.response.send_message(
+            "There's already a game here. Its host can /endgame it.", ephemeral=True)
     # Routing: each game keeps its own open_lobby; this only picks which one.
     if game == "botc":
         await botc_cog.open_lobby(interaction)
     else:
         await javis_cog.open_lobby(interaction)
+
+
+# Each game keeps its own dict of running games (channel id -> game), so
+# /endgame checks which dict has this channel and asks that game to stop.
+@bot.tree.command(name="endgame", description="End the game in this channel.")
+@app_commands.describe(winner="Clocktower only: which team won (Town of Javis finds its own winner)")
+@app_commands.choices(winner=[
+    app_commands.Choice(name="Good", value="Good"),
+    app_commands.Choice(name="Evil", value="Evil"),
+    app_commands.Choice(name="Nobody (stop the game)", value="none"),
+])
+async def endgame(interaction: discord.Interaction, winner: str = "none"):
+    if interaction.channel_id in botc_cog.games:
+        await botc_cog.stop_game(interaction, winner)
+    elif interaction.channel_id in javis_cog.games:
+        await javis_cog.stop_game(interaction)
+    else:
+        await interaction.response.send_message("No game here.", ephemeral=True)
 
 
 if __name__ == "__main__":

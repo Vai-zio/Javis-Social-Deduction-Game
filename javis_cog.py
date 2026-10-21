@@ -554,6 +554,19 @@ async def open_lobby(interaction: discord.Interaction):
     await interaction.response.send_message(lobby_text(game), view=LobbyView())
 
 
+async def stop_game(interaction: discord.Interaction):
+    """End the Town of Javis game in this channel. /endgame in bot.py calls this."""
+    game = games[interaction.channel_id]
+    if interaction.user.id != game.host_id:
+        return await interaction.response.send_message("Only the narrator can end it.", ephemeral=True)
+    await interaction.response.send_message("Ending the game.", ephemeral=True)
+    if not game.started:
+        del games[game.channel_id]
+        save_games()
+        return await interaction.channel.send("Lobby closed.")
+    await end_game(interaction.channel, game, None)
+
+
 class JavisCog(commands.Cog):
     """All Town of Javis commands. Inside a Cog, @app_commands.command
     replaces @bot.tree.command, and each command gets `self` first."""
@@ -667,20 +680,6 @@ class JavisCog(commands.Cog):
         await interaction.response.send_message(
             f"**{len(log)} finished games**\n" + "\n".join(lines))
 
-
-    @app_commands.command(name="endgame", description="End the game in this channel.")
-    async def endgame(self, interaction: discord.Interaction):
-        game = games.get(interaction.channel_id)
-        if not game:
-            return await interaction.response.send_message("No game here.", ephemeral=True)
-        if interaction.user.id != game.host_id:
-            return await interaction.response.send_message("Only the narrator can end it.", ephemeral=True)
-        await interaction.response.send_message("Ending the game.", ephemeral=True)
-        if not game.started:
-            del games[game.channel_id]
-            save_games()
-            return await interaction.channel.send("Lobby closed.")
-        await end_game(interaction.channel, game, None)
 
 
 async def setup(bot: commands.Bot):

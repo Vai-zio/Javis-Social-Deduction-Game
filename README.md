@@ -57,7 +57,7 @@ Storyteller:
 - `/botc day` starts the day and opens nominations.
 - `/botc execute` ends the day and executes whoever is on the block.
 - `/botc grimoire` shows you every character again.
-- `/botc endgame winner` reveals everyone.
+- `/endgame winner` (or `/botc endgame winner`) reveals everyone.
 
 Everyone:
 - `/botc nominate seat` nominates a player. Then everyone clicks **Raise / lower hand**, and the Storyteller clicks **Close vote**.
