@@ -83,9 +83,93 @@ class Forger(Character):
     triggers = "Each night"
 
 
+# --- Batch 2 ---------------------------------------------------------------
+# Each role has a short note on how it plays.
+
+class Shieldbearer(Character):
+    category = "Townsfolk"
+    ability = (
+        "Each night*, choose an alive neighbour: if the Demon chooses them "
+        "tonight, you die instead."
+    )
+    triggers = "Each night except the first"
+    # Plays: a Monk that sacrifices itself. Uses seating, so where you sit matters.
+
+
+class TallyClerk(Character):
+    name = "Tally Clerk"
+    category = "Townsfolk"
+    ability = "Each night, you learn how many evil players voted today."
+    triggers = "Each night"
+    # Plays: turns /vote into clues. Evil must think about every hand they raise.
+
+
+class Bellringer(Character):
+    category = "Townsfolk"
+    ability = (
+        "Once per game, at night, choose a character type: you learn how "
+        "many players of that type are alive."
+    )
+    triggers = "Once per game"
+    # Plays: great late game ("2 Minions still alive?!"). Weak if used early.
+
+
+class LightningRod(Character):
+    name = "Lightning Rod"
+    category = "Outsider"
+    ability = "If the Demon chooses one of your alive neighbours, you die instead."
+    triggers = "Passive"
+    # Plays: you protect neighbours, but good loses its Outsider early.
+
+
+class Twin(Character):
+    category = "Outsider"
+    ability = "You start knowing 1 good player. If they die, you die tonight."
+    triggers = "First night"
+    # Plays: a confirmed good friend, but the Demon gets 2 kills for 1.
+
+
+class Saboteur(Character):
+    category = "Minion"
+    ability = "Each night, choose a player: tomorrow, their vote does not count."
+    triggers = "Each night"
+    # Plays: quietly flips close executions. Good players notice odd vote counts.
+
+
+class Impersonator(Character):
+    category = "Minion"
+    ability = (
+        "Each night, choose a Townsfolk not in play: you register as that "
+        "character until tomorrow night."
+    )
+    triggers = "Each night"
+    # Plays: a Spy-like bluffer. Breaks info roles like Team Watcher on purpose.
+
+
+class Shade(Character):
+    category = "Demon"
+    ability = (
+        "Each night*, choose a player: they die. If you are executed while "
+        "a neighbour is a Minion, that Minion becomes the Shade."
+    )
+    triggers = "Each night except the first"
+    # Plays: evil wants to sit next to each other. Seating info roles shine here.
+
+
+class Rot(Character):
+    category = "Demon"
+    ability = "Each night*, choose a player: they die. Your alive neighbours register as evil."
+    triggers = "Each night except the first"
+    # Plays: framing. Pair Seer and Team Watcher point at innocent neighbours.
+
+
 # Every experimental role. The name lists below are built from it,
 # so a new role only has to be added here.
-EXPERIMENTAL_ROLES = [TruthSpeaker, TeamWatcher, PairSeer, Doubter, Forger]
+EXPERIMENTAL_ROLES = [
+    TruthSpeaker, TeamWatcher, PairSeer, Doubter, Forger,
+    Shieldbearer, TallyClerk, Bellringer, LightningRod, Twin,
+    Saboteur, Impersonator, Shade, Rot,
+]
 
 
 def names_in(category: str) -> list[str]:
