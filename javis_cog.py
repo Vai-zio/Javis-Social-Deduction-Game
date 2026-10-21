@@ -7,7 +7,7 @@ Everything else (Game, the views, the helpers) is the same code that used
 to live in bot.py.
 
 A round of play with the bot:
-  /newgame -> players Join -> Start (roles by DM, Mafia get a private thread)
+  /newgame javis -> players Join -> Start (roles by DM, Mafia get a private thread)
   /night   -> every living night role gets a dropdown by DM; the narrator
               gets one summary once everyone has chosen
   /kill    -> the narrator announces who died in the night
@@ -543,6 +543,17 @@ async def narrator_game(interaction: discord.Interaction) -> Game | None:
 
 
 
+async def open_lobby(interaction: discord.Interaction):
+    """Open a Town of Javis lobby. /newgame in bot.py calls this."""
+    if interaction.channel_id in games:
+        return await interaction.response.send_message(
+            "There's already a game here. The narrator can /endgame it.", ephemeral=True)
+    game = Game(interaction.channel_id, interaction.user.id, interaction.user.display_name)
+    games[interaction.channel_id] = game
+    save_games()
+    await interaction.response.send_message(lobby_text(game), view=LobbyView())
+
+
 class JavisCog(commands.Cog):
     """All Town of Javis commands. Inside a Cog, @app_commands.command
     replaces @bot.tree.command, and each command gets `self` first."""
@@ -557,17 +568,6 @@ class JavisCog(commands.Cog):
         self.bot.add_view(LobbyView())
         self.bot.add_view(RevealView())
         self.bot.add_view(TrialView())
-
-    @app_commands.command(name="newgame", description="Open a lobby. You will be the narrator.")
-    async def newgame(self, interaction: discord.Interaction):
-        if interaction.channel_id in games:
-            return await interaction.response.send_message(
-                "There's already a game here. The narrator can /endgame it.", ephemeral=True)
-        game = Game(interaction.channel_id, interaction.user.id, interaction.user.display_name)
-        games[interaction.channel_id] = game
-        save_games()
-        await interaction.response.send_message(lobby_text(game), view=LobbyView())
-
 
     @app_commands.command(name="gametest", description="Roll a test game with 6-15 fake players.")
     async def gametest(self, interaction: discord.Interaction):

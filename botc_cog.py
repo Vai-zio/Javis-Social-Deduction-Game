@@ -6,7 +6,7 @@ still runs the nights and decides what each player learns; the bot hands
 out roles, carries secret messages, shows the grimoire, and runs the votes.
 
 A round of play:
-  /botc new        -> players Join -> Start (roles by DM)
+  /newgame botc (or /botc new) -> players Join -> Start (roles by DM)
   /botc night      -> the Storyteller gets tonight's wake order
   /botc ask, /botc tell
                    -> wake a player: ask them to pick players (dropdown by DM)
@@ -416,6 +416,17 @@ def player_at(game: BotcGame, seat: int) -> int | None:
     return game.players[seat - 1] if 1 <= seat <= len(game.players) else None
 
 
+async def open_lobby(interaction: discord.Interaction):
+    """Open a Clocktower lobby. Used by /botc new and by /newgame botc in bot.py."""
+    if interaction.channel_id in games:
+        return await interaction.response.send_message(
+            "There's already a game here. The Storyteller can /botc endgame it.", ephemeral=True)
+    game = BotcGame(interaction.channel_id, interaction.user.id, interaction.user.display_name)
+    games[interaction.channel_id] = game
+    save_games()
+    await interaction.response.send_message(lobby_text(game), view=LobbyView())
+
+
 class BotcCog(commands.GroupCog, name="botc",
               group_description="Blood on the Clocktower commands"):
     """A GroupCog puts every command under one name, so /botc new, /botc day, ...
@@ -438,13 +449,7 @@ class BotcCog(commands.GroupCog, name="botc",
 
     @app_commands.command(name="new", description="Open a lobby. You will be the Storyteller.")
     async def new(self, interaction: discord.Interaction):
-        if interaction.channel_id in games:
-            return await interaction.response.send_message(
-                "There's already a game here. The Storyteller can /botc endgame it.", ephemeral=True)
-        game = BotcGame(interaction.channel_id, interaction.user.id, interaction.user.display_name)
-        games[interaction.channel_id] = game
-        save_games()
-        await interaction.response.send_message(lobby_text(game), view=LobbyView())
+        await open_lobby(interaction)
 
     @app_commands.command(name="test", description="Roll a test game with 5-15 fake players.")
     async def test(self, interaction: discord.Interaction):

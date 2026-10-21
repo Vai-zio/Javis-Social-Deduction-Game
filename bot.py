@@ -9,16 +9,20 @@ How it fits together:
      calls the item's callback.
   4. Each game is a Cog in its own file. This file only starts the bot and
      loads them:
-       javis_cog.py  Town of Javis: /newgame, /night, /vote, ...
-       botc_cog.py   Blood on the Clocktower: /botc new, /botc nominate, ...
+       javis_cog.py  Town of Javis: /night, /vote, ...
+       botc_cog.py   Blood on the Clocktower: /botc nominate, ...
+     /newgame lives here because it starts either game.
 """
 
 import os
 
 import discord
+from discord import app_commands
 from discord.ext import commands
 from dotenv import load_dotenv
 
+import botc_cog
+import javis_cog
 from common import HERE
 
 # Read DISCORD_TOKEN (and optional GUILD_ID) from discordbot.env, which sits
@@ -59,6 +63,23 @@ class JavisBot(commands.Bot):
 
 
 bot = JavisBot()
+
+
+# @app_commands.choices turns the option into a fixed list. Discord shows each
+# choice's *name*, and filters the list as you type, so typing "2" or "botc"
+# both find the Clocktower entry. The function receives the choice's *value*.
+@bot.tree.command(name="newgame", description="Open a lobby for a game. You run it.")
+@app_commands.describe(game="Which game to play")
+@app_commands.choices(game=[
+    app_commands.Choice(name="1 - Town of Javis (javis)", value="javis"),
+    app_commands.Choice(name="2 - Blood on the Clocktower (botc)", value="botc"),
+])
+async def newgame(interaction: discord.Interaction, game: str):
+    # Routing: each game keeps its own open_lobby; this only picks which one.
+    if game == "botc":
+        await botc_cog.open_lobby(interaction)
+    else:
+        await javis_cog.open_lobby(interaction)
 
 
 if __name__ == "__main__":
