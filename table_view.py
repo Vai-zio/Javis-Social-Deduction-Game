@@ -1,25 +1,24 @@
 """
 Draw the Blood on the Clocktower table as a PNG.
 
-Players sit around a circle, like the numbers on a clock.
-Seat 0 is at the top, and the seats go clockwise.
+Players sit around a long rectangular table.
+Seat 0 is at the top left, and the seats go clockwise.
 
 Run this file to make two demo pictures:
     table_public.png       (what everyone sees)
     table_storyteller.png  (same table, with roles shown)
 """
 
-import math
-
 from PIL import Image, ImageDraw, ImageFont
 
 from botc_roles import TOWNSFOLK, OUTSIDERS, MINIONS
 
 
-SIZE = 800                  # the picture is SIZE x SIZE pixels
-CENTER = SIZE // 2
-TABLE_RADIUS = 300          # distance from the middle to each seat
-SEAT_RADIUS = 55            # size of each seat circle
+WIDTH, HEIGHT = 1200, 700   # size of the picture in pixels
+CENTER = (WIDTH // 2, HEIGHT // 2)
+TABLE = (320, 220, 880, 480)    # the table: left, top, right, bottom
+SEATS = (190, 110, 1010, 590)   # the rectangle the seats sit on (a bit bigger)
+SEAT_RADIUS = 55                # size of each seat circle
 
 # Seat colours for the Storyteller copy
 COLOURS = {
@@ -33,19 +32,33 @@ DEAD_COLOUR = (90, 90, 90)
 
 
 # ---------------------------------------------------------------------------
-# Circle maths
+# Seat maths
 # ---------------------------------------------------------------------------
 
 def seat_position(seat: int, number_of_players: int) -> tuple[int, int]:
     """Return the (x, y) pixel where a seat goes."""
-    # Split the full circle (360 degrees) into equal slices.
-    # Subtract 90 so seat 0 starts at the top instead of the right.
-    angle = math.radians(360 / number_of_players * seat - 90)
+    left, top, right, bottom = SEATS
+    width = right - left
+    height = bottom - top
 
-    # cos gives "how far right", sin gives "how far down".
-    x = CENTER + TABLE_RADIUS * math.cos(angle)
-    y = CENTER + TABLE_RADIUS * math.sin(angle)
-    return round(x), round(y)
+    # Imagine cutting the rectangle's edge open into one straight line.
+    # Its length is the perimeter. Space the seats evenly along it.
+    # "+ 0.5" moves every seat half a step, so no seat lands on a corner.
+    perimeter = 2 * (width + height)
+    distance = perimeter * (seat + 0.5) / number_of_players
+
+    # Now fold the line back into a rectangle, one side at a time:
+    # top (going right), right side (down), bottom (left), left side (up).
+    if distance < width:
+        return round(left + distance), top
+    distance -= width
+    if distance < height:
+        return right, round(top + distance)
+    distance -= height
+    if distance < width:
+        return round(right - distance), bottom
+    distance -= width
+    return left, round(bottom - distance)
 
 
 def alive_neighbours(players: list[dict], seat: int) -> tuple[int, int]:
@@ -94,18 +107,15 @@ def draw_table(players: list[dict], show_roles: bool = False) -> Image.Image:
         {"name": "Vai", "role": "Imp", "alive": True}
     show_roles: True for the Storyteller's private copy.
     """
-    image = Image.new("RGB", (SIZE, SIZE), (30, 30, 40))
+    image = Image.new("RGB", (WIDTH, HEIGHT), (30, 30, 40))
     draw = ImageDraw.Draw(image)
     name_font = get_font(18)
     role_font = get_font(14)
 
     # The table itself
-    draw.ellipse(
-        (CENTER - 210, CENTER - 210, CENTER + 210, CENTER + 210),
-        fill=(90, 60, 40),
-    )
+    draw.rounded_rectangle(TABLE, radius=25, fill=(90, 60, 40))
     alive_count = sum(player["alive"] for player in players)
-    draw.text((CENTER, CENTER), f"{alive_count} alive",
+    draw.text(CENTER, f"{alive_count} alive",
               font=get_font(28), fill="white", anchor="mm")
 
     for seat, player in enumerate(players):
