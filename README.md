@@ -31,7 +31,7 @@ Narrator:
 Everyone:
 - `/alive` lists living players.
 - `/stats` shows how often each side has won.
-- `/gametest` rolls a fake game so you can check the role setup alone.
+- `/gametest players` rolls a fake game with that many players (6 to 15, or random if left empty) so you can check the role setup alone.
 
 ## How it works
 
@@ -62,7 +62,7 @@ Storyteller:
 Everyone:
 - `/botc nominate seat` nominates a player. Then everyone clicks **Raise / lower hand**, and the Storyteller clicks **Close vote**.
 - `/botc table` shows who sits where and who is dead.
-- `/botc test` rolls a fake game so you can check the setup alone.
+- `/botc test players` rolls a fake game with that many players (5 to 15, or random if left empty) so you can check the setup alone.
 
 Voting rules the bot checks: only the living nominate; each player nominates once and is nominated once per day; dead players keep one last vote; to go on the block you need at least half the living players *and* more votes than whoever is on it (a tie means nobody).
 

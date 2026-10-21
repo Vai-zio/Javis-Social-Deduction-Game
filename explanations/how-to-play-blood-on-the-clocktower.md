@@ -44,7 +44,7 @@ The Storyteller ends it with `/botc endgame winner`, which reveals everyone.
 - **Baron:** 2 Townsfolk are swapped for 2 Outsiders.
 - **Drunk:** the player is told a Townsfolk character that is not in play, and never learns the truth.
 
-Try `/botc test` to roll a fake game.
+Try `/botc test` to roll a fake game. Add a number, like `/botc test players:9`, to see the setup for that many players.
 
 ## The characters
 
