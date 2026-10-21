@@ -11,3 +11,4 @@ games.json
 table_public.png
 table_storyteller.png
 botc_games.json
+.pytest_cache/

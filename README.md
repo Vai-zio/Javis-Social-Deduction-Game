@@ -9,7 +9,7 @@ A Discord interface for the game. The narrator opens a lobby, players click **Jo
    pip install -r requirements.txt
    ```
 2. Create a bot at https://discord.com/developers/applications (New Application, then the **Bot** tab, then **Reset Token** and copy it).
-3. Put the token in `discordbot.env` in the folder **above** this one (`Claude projects`), written as `DISCORD_TOKEN=your-token`. See `.env.example` for the format. Never put the token in code or share that file.
+3. Put the token in `discordbot.env` in the folder **above** this one, written as `DISCORD_TOKEN=your-token`. See `.env.example` for the format. Never put the token in code or share that file.
 4. Invite the bot: **OAuth2 > URL Generator**, tick `bot` and `applications.commands`, permissions `Send Messages`, `Create Private Threads`, `Send Messages in Threads` and `Manage Threads`, then open the link. The thread permissions are for the Mafia's private chat.
 5. Start it:
    ```
