@@ -31,6 +31,10 @@ from botc_roles import FIRST_NIGHT_ORDER, OTHER_NIGHTS_ORDER
 from common import HERE, get_user
 from table_view import draw_table, role_category
 
+# SystemRandom asks the operating system for fresh randomness on every call,
+# so nobody can predict the next roll by studying earlier ones.
+rng = random.SystemRandom()
+
 SAVE_FILE = os.path.join(HERE, "botc_games.json")
 
 # SETUP_COUNTS in botc_roles has setups for 5 to 15 players.
@@ -113,7 +117,7 @@ def assign_roles(game: BotcGame) -> None:
     """Reuse generate_roles from botc.py, then shuffle the roles into the seats."""
     setup = generate_roles(len(game.players))
     roles = setup["roles"]
-    random.shuffle(roles)        # generate_roles returns good roles first, evil last
+    rng.shuffle(roles)        # generate_roles returns good roles first, evil last
     game.roles = dict(zip(game.players, roles))
     game.drunk_shown_as = setup["drunk_shown_as"]
     game.bluffs = setup["bluffs"]
@@ -470,7 +474,7 @@ class BotcCog(commands.GroupCog, name="botc",
     async def test(self, interaction: discord.Interaction,
                    players: app_commands.Range[int, MIN_PLAYERS, MAX_PLAYERS] | None = None):
         # Same idea as /gametest: Discord only accepts 5 to 15 here.
-        count = players or random.randint(MIN_PLAYERS, MAX_PLAYERS)
+        count = players or rng.randint(MIN_PLAYERS, MAX_PLAYERS)
         game = BotcGame(interaction.channel_id, interaction.user.id, interaction.user.display_name)
         game.players = list(range(1, count + 1))
         game.names = {i: f"Test{i}" for i in game.players}

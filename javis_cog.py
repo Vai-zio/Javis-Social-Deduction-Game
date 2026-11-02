@@ -31,6 +31,10 @@ from TownOfJavis2 import (
 )
 from common import HERE, get_user
 
+# SystemRandom asks the operating system for fresh randomness on every call,
+# so nobody can predict the next roll by studying earlier ones.
+rng = random.SystemRandom()
+
 SAVE_FILE = os.path.join(HERE, "games.json")     # running games, survives restarts
 LOG_FILE = os.path.join(HERE, "game_log.json")   # finished games, for /stats
 
@@ -134,7 +138,7 @@ def log_game(game: Game, winner: str) -> None:
 def assign_roles(game: Game) -> None:
     """Reuse the existing game logic, hand roles out at random, then pick targets."""
     roles = generate_roles(len(game.players))
-    random.shuffle(roles)
+    rng.shuffle(roles)
     game.roles = dict(zip(game.players, roles))
     game.alive = list(game.players)
 
@@ -143,9 +147,9 @@ def assign_roles(game: Game) -> None:
         if role == "Executioner":
             # Must get a Town player voted out; fall back to anyone if there's no Town.
             town = [u for u in others if game.roles[u] in TOWN_ROLES]
-            game.targets[uid] = random.choice(town or others)
+            game.targets[uid] = rng.choice(town or others)
         elif role == "Guardian Angel":
-            game.targets[uid] = random.choice(others)
+            game.targets[uid] = rng.choice(others)
 
 
 def lobby_text(game: Game) -> str:
@@ -589,7 +593,7 @@ class JavisCog(commands.Cog):
         # Range[int, low, high] tells Discord the allowed numbers, so Discord
         # itself refuses anything outside them before the bot sees it.
         # Fake players are just ids 1..count with made-up names. It isn't saved.
-        count = players or random.randint(MIN_PLAYERS, MAX_PLAYERS)
+        count = players or rng.randint(MIN_PLAYERS, MAX_PLAYERS)
         game = Game(interaction.channel_id, interaction.user.id, interaction.user.display_name)
         game.players = list(range(1, count + 1))
         game.names = {i: f"Test{i}" for i in game.players}
