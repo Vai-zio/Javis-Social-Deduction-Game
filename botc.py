@@ -5,6 +5,10 @@ from botc_roles import (
     SETUP_COUNTS, FIRST_NIGHT_ORDER, OTHER_NIGHTS_ORDER,
 )
 
+# SystemRandom asks the operating system for fresh randomness on every call,
+# so nobody can predict the next roll by studying earlier ones.
+rng = random.SystemRandom()
+
 
 # ---------------------------------------------------------------------------
 # Input
@@ -31,7 +35,7 @@ def get_number_of_players() -> int:
 
 def pick(pool: list[str], amount: int) -> list[str]:
     """Pick some different roles from a pool."""
-    return random.sample(pool, amount)
+    return rng.sample(pool, amount)
 
 
 def generate_roles(number_of_players: int) -> dict:
@@ -64,7 +68,7 @@ def generate_roles(number_of_players: int) -> dict:
     drunk_shown_as = None
     if "Drunk" in roles:
         fake_townsfolk = [role for role in not_in_play if role in TOWNSFOLK]
-        drunk_shown_as = random.choice(fake_townsfolk)
+        drunk_shown_as = rng.choice(fake_townsfolk)
         not_in_play.remove(drunk_shown_as)
 
     bluffs = pick(not_in_play, 3)
@@ -96,7 +100,7 @@ def sort_roles(roles: list[str], night_order: list[str]) -> list[str]:
 def get_random_player_numbers(number_of_players: int) -> list[int]:
     """Return player numbers in a random order."""
     player_numbers = list(range(1, number_of_players + 1))
-    random.shuffle(player_numbers)
+    rng.shuffle(player_numbers)
     return player_numbers
 
 

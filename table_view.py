@@ -152,12 +152,12 @@ def draw_table(players: list[dict], show_roles: bool = False) -> Image.Image:
 # ---------------------------------------------------------------------------
 
 if __name__ == "__main__":
-    import random
+    from random import SystemRandom
     from botc import generate_roles
 
     names = ["Vai", "Ann", "Bo", "Cy", "Dee", "Eli", "Fay", "Gus"]
     setup = generate_roles(len(names))
-    random.shuffle(setup["roles"])   # roles come out sorted good-then-evil
+    SystemRandom().shuffle(setup["roles"])   # roles come out sorted good-then-evil
 
     players = [
         {"name": name, "role": role, "alive": True}

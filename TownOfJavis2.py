@@ -1,5 +1,9 @@
 import random
 
+# SystemRandom asks the operating system for fresh randomness on every call,
+# so nobody can predict the next roll by studying earlier ones.
+rng = random.SystemRandom()
+
 
 # ---------------------------------------------------------------------------
 # Role pools
@@ -194,17 +198,17 @@ def choose_role(
 
     if role_type == "town_info":
         pool = role_pools["town_info"]
-        role = random.choice(pool)
+        role = rng.choice(pool)
         pool.remove(role)
 
     elif role_type == "town_util":
         pool = role_pools["town_util"]
-        role = random.choice(pool)
+        role = rng.choice(pool)
         pool.remove(role)
 
     elif role_type == "town_kill":
         pool = role_pools["town_kill"]
-        role = random.choice(pool)
+        role = rng.choice(pool)
         pool.remove(role)
 
     elif role_type == "mafia_kill":
@@ -217,28 +221,28 @@ def choose_role(
 
     elif role_type == "mafia_util":
         pool = role_pools["mafia_util"]
-        role = random.choice(pool)
+        role = rng.choice(pool)
         pool.remove(role)
 
     elif role_type == "neutral":
         if number_of_players < 9 or killing_neutral_present:
-            neutral_type = random.randint(1, 2)
+            neutral_type = rng.randint(1, 2)
         else:
-            neutral_type = random.randint(1, 3)
+            neutral_type = rng.randint(1, 3)
 
         if neutral_type == 1:
             pool = role_pools["neutral_benign"]
-            role = random.choice(pool)
+            role = rng.choice(pool)
             pool.remove(role)
 
         elif neutral_type == 2:
             pool = role_pools["neutral_evil"]
-            role = random.choice(pool)
+            role = rng.choice(pool)
             pool.remove(role)
 
         else:
             pool = role_pools["neutral_kill"]
-            role = random.choice(pool)
+            role = rng.choice(pool)
             pool.remove(role)
             killing_neutral_present = True
 
@@ -288,7 +292,7 @@ def sort_roles(roles: list[str]) -> list[str]:
 def get_random_player_numbers(number_of_players: int) -> list[int]:
     """Return player numbers in a random order."""
     player_numbers = list(range(1, number_of_players + 1))
-    random.shuffle(player_numbers)
+    rng.shuffle(player_numbers)
     return player_numbers
 
 

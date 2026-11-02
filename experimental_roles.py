@@ -3,6 +3,10 @@ import random
 from botc_roles import TOWNSFOLK, OUTSIDERS, MINIONS, DEMONS
 from characters import Character
 
+# SystemRandom asks the operating system for fresh randomness on every call,
+# so nobody can predict the next roll by studying earlier ones.
+rng = random.SystemRandom()
+
 
 # ---------------------------------------------------------------------------
 # Experimental homebrew roles
@@ -208,7 +212,7 @@ def all_statements(seats: list[str], dead: set[int], me: int) -> list[tuple[str,
 
     # "There are exactly N Outsiders."
     outsiders = sum(1 for role in seats if character_type(role) == "Outsider")
-    guess = random.choice([outsiders, outsiders + 1, max(0, outsiders - 1)])
+    guess = rng.choice([outsiders, outsiders + 1, max(0, outsiders - 1)])
     statements.append((f"There are exactly {guess} Outsiders.", guess == outsiders))
 
     return statements
@@ -224,11 +228,11 @@ def truth_speaker_info(seats: list[str], dead: set[int], me: int, broken: bool =
     false_ones = [text for text, is_true in statements if not is_true]
 
     if broken:
-        info = random.sample(false_ones, 2)
+        info = rng.sample(false_ones, 2)
     else:
-        info = [random.choice(true_ones), random.choice(false_ones)]
+        info = [rng.choice(true_ones), rng.choice(false_ones)]
 
-    random.shuffle(info)
+    rng.shuffle(info)
     return info
 
 
